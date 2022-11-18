@@ -1,0 +1,28 @@
+{   
+    "$schema": "https://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "accountName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Azure DevOps organization to be created by terraform."
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.VisualStudio/account",
+            "apiVersion": "2014-04-01-preview",
+            "name": "[parameters('accountName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "tags": {},
+            "properties": {
+                "operationType": "Create",
+                "accountName": "[parameters('accountName')]"
+            },
+            "resources": []
+        }
+    ]
+}

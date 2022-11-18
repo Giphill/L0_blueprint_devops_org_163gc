@@ -1,5 +1,5 @@
 locals {
-  config  = read_terragrunt_config("config.hcl").locals
+  config  = read_terragrunt_config("./config.hcl").locals
 }
 
 terraform {
@@ -17,11 +17,36 @@ terraform {
       "refresh"
     ]
     env_vars = {
-      ARM_SUBSCRIPTION_ID = local.config.subscription_id
+      ARM_SUBSCRIPTION_ID = local.config.billing_subscription
     }
+  }
+}
+remote_state {
+  # Disabling since it's causing issues as per 	
+  # https://github.com/gruntwork-io/terragrunt/pull/1317#issuecomment-682041007	
+  disable_dependency_optimization = true
+
+  backend = "azurerm"
+  generate = {
+    path      = "backend.azurerm.tf"
+    if_exists = "overwrite"
+  }
+  config = {
+     subscription_id = local.config.backend_subscription
+
+    // # Data from Rover Launchpad
+    resource_group_name  = local.config.backend_resource_group
+    storage_account_name = local.config.backend_storage_account
+    container_name       = local.config.backend_container_name
+
+   key = "devops/org/${local.config.org_name}/terraform.tfstate"
   }
 }
 
 inputs = {
-  location = local.config.location
+  org_name  = local.config.org_name
+  env = local.config.env
+  group = local.config.group
+  tags = local.config.tags
 }
+
